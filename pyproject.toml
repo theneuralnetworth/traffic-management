@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "traffic-management"
+version = "0.1.0"
+description = ""
+authors = ["José Coelho <16445494+jcoelho93@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+spade = "^4.1.0"
+requests = "^2.32.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
