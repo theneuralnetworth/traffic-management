@@ -1,0 +1,13 @@
+services:
+  prosody:
+    image: prosody/prosody:latest
+    platform: linux/amd64
+    container_name: xmpp
+    ports:
+      - "5222:5222"
+    environment:
+      XMPP_DOMAIN: localhost
+      XMPP_USER: agent
+      XMPP_PASSWORD: password
+    volumes:
+      - ./prosody.cfg.lua:/etc/prosody/prosody.cfg.lua:ro
