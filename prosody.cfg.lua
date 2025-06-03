@@ -24,3 +24,8 @@ c2s_require_encryption = false
 
 VirtualHost "localhost"
     enabled = true
+
+VirtualHost "xmpp"
+    enabled = true
+    allow_registration = true
+    authentication = "internal_plain"

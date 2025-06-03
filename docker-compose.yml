@@ -1,5 +1,5 @@
 services:
-  prosody:
+  xmpp:
     image: prosody/prosody:latest
     platform: linux/amd64
     container_name: xmpp
@@ -7,7 +7,20 @@ services:
       - "5222:5222"
     environment:
       XMPP_DOMAIN: localhost
-      XMPP_USER: agent
+      XMPP_USER: |
+        trafficlight:password
+        vehicle:password
       XMPP_PASSWORD: password
     volumes:
+      - prosody_data:/var/lib/prosody
       - ./prosody.cfg.lua:/etc/prosody/prosody.cfg.lua:ro
+
+  tfm:
+    build:
+      context: .
+    image: traffic-management:latest
+    environment:
+      XMPP_HOST: xmpp
+
+volumes:
+  prosody_data:
