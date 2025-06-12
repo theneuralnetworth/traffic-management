@@ -1,7 +1,8 @@
-from spade.agent import Agent
+from traffic_management.agents.base import BaseAgent
 from spade.behaviour import CyclicBehaviour
 from spade.template import Template
 from spade.message import Message
+from traffic_management.agents.simulation import ClockMessage
 
 
 class TrafficLightStatus(Template):
@@ -17,7 +18,10 @@ class TrafficLightStatus(Template):
         return msg
 
 
-class VehicleAgent(Agent):
+class VehicleAgent(BaseAgent):
+    def __init__(self, id: str):
+        super().__init__(id=id)
+
     class MoveBehaviour(CyclicBehaviour):
         async def run(self):
             msg: Message = await self.receive(timeout=10)
@@ -31,6 +35,13 @@ class VehicleAgent(Agent):
                 case "yellow":
                     print(f"[{self.agent.name}] Light is yellow. Caution...")
 
+    class ClockBehaviour(CyclicBehaviour):
+        async def run(self):
+            msg: Message = await self.receive(timeout=1)
+            if msg:
+                print(f"[{self.agent.name}] Clock tick received: {msg.body}")
+
     async def setup(self):
         print(f"[{self.name}] Vehicle agent started.")
+        self.add_behaviour(self.ClockBehaviour(), ClockMessage())
         self.add_behaviour(self.MoveBehaviour(), TrafficLightStatus())

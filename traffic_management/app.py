@@ -1,18 +1,19 @@
-import os
 import spade
 import asyncio
 from traffic_management.agents import TrafficLightAgent
 from traffic_management.agents import VehicleAgent
+from traffic_management.agents.simulation import ClockAgent
 
 
 async def main():
-    xmpp_server = os.getenv("XMPP_HOST", "localhost")
-
-    tl = TrafficLightAgent(f"trafficlight@{xmpp_server}", "password")
-    vh = VehicleAgent(f"vehicle@{xmpp_server}", "password")
+    clock = ClockAgent("clock")
+    tl = TrafficLightAgent("trafficlight")
+    vh = VehicleAgent("vehicle")
 
     try:
-        await asyncio.wait_for(asyncio.gather(tl.start(), vh.start()), timeout=10)
+        await asyncio.wait_for(
+            asyncio.gather(clock.start(), tl.start(), vh.start()), timeout=10
+        )
     except asyncio.TimeoutError:
         print(
             "Timeout while starting agents. Please check your XMPP server configuration."

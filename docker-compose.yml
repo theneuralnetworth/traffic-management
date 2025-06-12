@@ -19,8 +19,23 @@ services:
     build:
       context: .
     image: traffic-management:latest
+    container_name: tfm
     environment:
       XMPP_HOST: xmpp
+
+  sumo:
+    image: ghcr.io/eclipse-sumo/sumo:latest
+    platform: linux/amd64
+    container_name: sumo
+    command: sumo -c /sumo/sumo.xml
+    ports:
+      - "8813:8813"
+    volumes:
+      - ./sumo.xml:/sumo/sumo.xml:ro
+
+  ros:
+    image: arm64v8/ros:humble-ros-core
+    container_name: ros
 
 volumes:
   prosody_data:

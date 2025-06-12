@@ -1,10 +1,9 @@
-from re import L
-from spade.agent import Agent
-from spade.behaviour import PeriodicBehaviour
-from spade.message import Message
+from traffic_management.agents.base import BaseAgent
+from spade.behaviour import PeriodicBehaviour, CyclicBehaviour
 from enum import Enum
-
+from spade.message import Message
 from traffic_management.agents.vehicles import TrafficLightStatus
+from traffic_management.agents.simulation import ClockMessage
 
 
 class LightState(Enum):
@@ -13,7 +12,11 @@ class LightState(Enum):
     YELLOW = "yellow"
 
 
-class TrafficLightAgent(Agent):
+class TrafficLightAgent(BaseAgent):
+    def __init__(self, id: str):
+        super().__init__(id=id)
+        self.light_state = LightState.RED
+
     class ControlLightBehaviour(PeriodicBehaviour):
         async def run(self):
             match self.agent.light_state:
@@ -36,10 +39,17 @@ class TrafficLightAgent(Agent):
                 )
             )
 
+    class ClockBehaviour(CyclicBehaviour):
+        async def run(self):
+            msg: Message = await self.receive(timeout=1)
+            if msg:
+                print(f"[{self.agent.name}] Clock tick received: {msg.body}")
+
     async def set_light_state(self, state: LightState):
         self.light_state = state
 
     async def setup(self):
         self.light_state = LightState.RED
         print(f"[{self.name}] Traffic Light agent started.")
+        self.add_behaviour(self.ClockBehaviour(), ClockMessage())
         self.add_behaviour(self.ControlLightBehaviour(period=5))
