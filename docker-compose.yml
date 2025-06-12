@@ -21,6 +21,7 @@ services:
     container_name: tfm
     environment:
       XMPP_HOST: xmpp
+      MQTT_HOST: mqtt
 
   sumo:
     image: ghcr.io/eclipse-sumo/sumo:latest
