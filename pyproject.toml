@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.13"
 spade = "^4.1.0"
 requests = "^2.32.3"
+traci = "^1.23.1"
 
 
 [build-system]
