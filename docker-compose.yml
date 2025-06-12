@@ -33,6 +33,20 @@ services:
     volumes:
       - ./config/sumo/sumo.xml:/sumo/sumo.xml:ro
 
+  ros:
+    build:
+      context: .
+      dockerfile: Dockerfile.ros
+    container_name: ros
+    command: sleep infinity
+    environment:
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_DOMAIN_ID=0
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/root/workspace
+
   mqtt:
     image: eclipse-mosquitto:latest
     platform: linux/amd64

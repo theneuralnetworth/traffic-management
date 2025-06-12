@@ -14,3 +14,6 @@ class BaseAgent(Agent):
             msg = await self.receive(timeout=1)
             if msg and msg.metadata.get("type") == "clock_tick":
                 print(f"[{self.agent.name}] Received clock tick")
+
+    async def setup(self):
+        self.presence.subscribe
