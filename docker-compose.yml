@@ -13,12 +13,11 @@ services:
       XMPP_PASSWORD: password
     volumes:
       - prosody_data:/var/lib/prosody
-      - ./prosody.cfg.lua:/etc/prosody/prosody.cfg.lua:ro
+      - ./config/prosody/prosody.cfg.lua:/etc/prosody/prosody.cfg.lua:ro
 
   tfm:
     build:
       context: .
-    image: traffic-management:latest
     container_name: tfm
     environment:
       XMPP_HOST: xmpp
@@ -31,11 +30,19 @@ services:
     ports:
       - "8813:8813"
     volumes:
-      - ./sumo.xml:/sumo/sumo.xml:ro
+      - ./config/sumo/sumo.xml:/sumo/sumo.xml:ro
 
-  ros:
-    image: arm64v8/ros:humble-ros-core
-    container_name: ros
+  mqtt:
+    image: eclipse-mosquitto:latest
+    platform: linux/amd64
+    container_name: mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/var/lib/mosquitto
 
 volumes:
   prosody_data:
+  mosquitto_data:

@@ -4,7 +4,7 @@ from spade.message import Message
 from spade.template import Template
 
 
-class ClockMessage(Template):
+class ClockTickMessage(Template):
     def __init__(self):
         super().__init__()
         self.set_metadata("type", "clock_tick")
@@ -28,7 +28,7 @@ class ClockAgent(BaseAgent):
     class TickBehaviour(PeriodicBehaviour):
         async def run(self):
             for agent in self.agent.all_agents:
-                msg: Message = ClockMessage().build_message(
+                msg: Message = ClockTickMessage().build_message(
                     to=f"{agent}@{self.agent.jid.domain}"
                 )
                 await self.send(msg)
