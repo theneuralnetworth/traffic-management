@@ -20,13 +20,13 @@ class TrafficLightAgent(BaseAgent):
         async def run(self):
             match self.agent.light_state:
                 case LightState.RED:
-                    self.agent.light_state = LightState.GREEN
+                    self.agent.set_light_state(LightState.GREEN)
                 case LightState.GREEN:
-                    self.agent.light_state = LightState.YELLOW
+                    self.agent.set_light_state(LightState.YELLOW)
                 case LightState.YELLOW:
-                    self.agent.light_state = LightState.RED
+                    self.agent.set_light_state(LightState.RED)
                 case _:
-                    self.agent.light_state = LightState.RED
+                    self.agent.set_light_state(LightState.RED)
             print(
                 f"[{self.agent.name}] Light changed to {self.agent.light_state.value}."
             )
@@ -38,10 +38,12 @@ class TrafficLightAgent(BaseAgent):
                 )
             )
 
-    async def set_light_state(self, state: LightState):
+    def set_light_state(self, state: LightState):
         self.light_state = state
+        self.mqtt.publish(f"traffic_light/{self.jid.local}/state", state.value)
 
     async def setup(self):
+        self.setup_mqtt()
         self.light_state = LightState.RED
         print(f"[{self.name}] Traffic Light agent started.")
         self.add_behaviour(self.ClockTickReceiveBehaviour(), ClockTickMessage())

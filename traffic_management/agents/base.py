@@ -16,14 +16,18 @@ class BaseAgent(Agent):
             if msg and msg.metadata.get("type") == "clock_tick":
                 print(f"[{self.agent.name}] Received clock tick")
 
-    async def setup(self):
+    def on_mqtt_connect(self, client, userdata, flags, rc, properties):
+        print(f"[{self.jid}] Connected to MQTT broker")
+
+    def on_mqtt_message(self, client, userdata, msg):
+        print(f"[{self.jid}] Received MQTT message on topic {msg.topic}")
+
+    def setup_mqtt(self):
         MQTT_HOST = os.getenv("MQTT_HOST", "localhost")
         MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
 
-        # self.mqtt = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, self.jid)
-        # self.mqtt.on_connect = self.on_mqtt_connect
-        # self.mqtt.on_message = self.on_mqtt_message
-        # self.mqtt.on_disconnect = self.on_mqtt_disconnect
-        # self.mqtt.connect(MQTT_HOST, MQTT_PORT, 60)
-        # self.mqtt.loop_start()
-        # print(f"[{self.name}] Agent started.")
+        self.mqtt = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, self.jid.local)
+        self.mqtt.on_connect = self.on_mqtt_connect
+        self.mqtt.on_message = self.on_mqtt_message
+
+        self.mqtt.connect(MQTT_HOST, MQTT_PORT, 60)

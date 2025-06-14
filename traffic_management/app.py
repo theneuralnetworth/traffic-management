@@ -1,6 +1,7 @@
 import spade
 import asyncio
 from traffic_management.agents import (
+    TrafficLightAgent,
     Ambulance,
     Police,
     EmergencyDispatch,
@@ -9,11 +10,12 @@ from traffic_management.agents import (
 
 async def main():
     agents = [
-        Ambulance("ambulance1"),
-        Ambulance("ambulance2"),
-        Police("police1"),
-        Police("police2"),
-        EmergencyDispatch("emergency_dispatch"),
+        TrafficLightAgent("traffic_light_1"),
+        # Ambulance("ambulance1"),
+        # Ambulance("ambulance2"),
+        # Police("police1"),
+        # Police("police2"),
+        # EmergencyDispatch("emergency_dispatch"),
     ]
     try:
         await asyncio.wait_for(
