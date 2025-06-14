@@ -1,7 +1,7 @@
 .PHONY: up build logs
 
 up:
-	docker compose up -d --build
+	docker compose up -d --build tfm
 
 build:
 	docker compose build

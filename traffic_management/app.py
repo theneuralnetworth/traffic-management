@@ -1,24 +1,33 @@
 import spade
 import asyncio
-from traffic_management.agents import TrafficLightAgent
-from traffic_management.agents import VehicleAgent
-from traffic_management.agents.simulation import ClockAgent
+from traffic_management.agents import (
+    TrafficLightAgent,
+    VehicleAgent,
+    Ambulance,
+    EmergencyDispatch,
+    ClockAgent,
+)
 
 
 async def main():
-    clock = ClockAgent("clock")
-    tl = TrafficLightAgent("trafficlight")
-    vh = VehicleAgent("vehicle")
-
+    agents = [
+        # ClockAgent("clock"),
+        # TrafficLightAgent("trafficlight"),
+        # VehicleAgent("vehicle"),
+        Ambulance("ambulance1"),
+        Ambulance("ambulance2"),
+        EmergencyDispatch("emergency_dispatch"),
+    ]
     try:
         await asyncio.wait_for(
-            asyncio.gather(clock.start(), tl.start(), vh.start()), timeout=10
+            asyncio.gather(*(agent.start() for agent in agents)),
+            timeout=10,
         )
     except asyncio.TimeoutError:
         print(
             "Timeout while starting agents. Please check your XMPP server configuration."
         )
-    await spade.wait_until_finished([tl, vh])
+    await spade.wait_until_finished(agents)
 
 
 if __name__ == "__main__":
