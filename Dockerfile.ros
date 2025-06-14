@@ -1,9 +1,11 @@
-FROM arm64v8/ros:humble-ros-core
+#FROM arm64v8/ros:humble-ros-core
+FROM ros:humble-ros-base
 
 # Create workspace
 WORKDIR /root/ros2_ws/src
 
-RUN apt update && apt install -y python3-colcon-common-extensions
+RUN apt update && apt install -y python3-colcon-common-extensions && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the ROS package
 COPY traffic_nodes ./traffic_nodes
@@ -17,3 +19,5 @@ RUN . /opt/ros/humble/setup.sh \
     && echo "source /root/ros2_ws/install/setup.bash" >> ~/.bashrc
 
 ENTRYPOINT ["/bin/bash", "-c", "source /opt/ros/humble/setup.bash && source /root/ros2_ws/install/setup.bash && exec \"$@\"", "--"]
+
+CMD ["ros2", "run", "traffic_nodes", "simple_node"]
