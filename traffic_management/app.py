@@ -1,21 +1,18 @@
 import spade
 import asyncio
 from traffic_management.agents import (
-    TrafficLightAgent,
-    VehicleAgent,
     Ambulance,
+    Police,
     EmergencyDispatch,
-    ClockAgent,
 )
 
 
 async def main():
     agents = [
-        # ClockAgent("clock"),
-        # TrafficLightAgent("trafficlight"),
-        # VehicleAgent("vehicle"),
         Ambulance("ambulance1"),
         Ambulance("ambulance2"),
+        Police("police1"),
+        Police("police2"),
         EmergencyDispatch("emergency_dispatch"),
     ]
     try:
