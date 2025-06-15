@@ -1,0 +1,15 @@
+<configuration>
+    <input>
+        <net-file value="simple_network/simple.net.xml"/>
+        <route-files value="simple_network/simple.rou.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="10000"/>
+    </time>
+
+    <report>
+        <verbose value="true" />
+    </report>
+
+</configuration>

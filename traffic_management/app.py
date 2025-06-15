@@ -10,7 +10,7 @@ from traffic_management.agents import (
 
 async def main():
     agents = [
-        TrafficLightAgent("traffic_light_1"),
+        TrafficLightAgent("trafficlight-1"),
         # Ambulance("ambulance1"),
         # Ambulance("ambulance2"),
         # Police("police1"),

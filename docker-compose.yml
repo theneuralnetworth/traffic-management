@@ -53,11 +53,11 @@ services:
     image: ghcr.io/eclipse-sumo/sumo:latest
     platform: linux/amd64
     container_name: sumo
-    command: sumo -c /sumo/sumo.xml
+    command: sumo -c /sumo/simple.sumocfg
     ports:
       - "8813:8813"
     volumes:
-      - ./config/sumo/sumo.xml:/sumo/sumo.xml:ro
+      - ./config/sumo:/sumo
 
   ros:
     build:
