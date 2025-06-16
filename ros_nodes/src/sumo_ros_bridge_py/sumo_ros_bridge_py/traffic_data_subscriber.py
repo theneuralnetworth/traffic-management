@@ -18,6 +18,9 @@ class TrafficDataSubscriber(Node):
         for i, vid in enumerate(msg.vehicle_ids):
             self.get_logger().info(f'Vehicle {vid}: Type={msg.vehicle_types[i]}, Speed={msg.vehicle_speeds[i]}, Accel={msg.vehicle_accels[i]}, Decel={msg.vehicle_decels[i]}, Distance={msg.vehicle_distances[i]}, WaitingTime={msg.vehicle_waiting_times[i]}, IsStopped={msg.vehicle_is_stopped[i]}, Position={msg.vehicle_positions[i]}, LaneID={msg.vehicle_lane_ids[i]}, RoadID={msg.vehicle_road_ids[i]}')
 
+        # Log summary of received data
+        self.get_logger().info(f'Total vehicles: {len(msg.vehicle_ids)}, Average speed: {msg.average_speed:.2f} m/s')
+
 def main(args=None):
     rclpy.init(args=args)
     node = TrafficDataSubscriber()

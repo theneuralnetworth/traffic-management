@@ -5,8 +5,8 @@ import rclpy
 from rclpy.node import Node
 import traci
 from sumo_ros_bridge.msg import TrafficData
-from std_msgs.msg import String
 from ament_index_python.packages import get_package_share_directory
+from sumo_ros_bridge.msg import LightCommand
 
 class BridgeNode(Node):
     def __init__(self):
@@ -23,11 +23,16 @@ class BridgeNode(Node):
         self.publisher_ = self.create_publisher(TrafficData, '/traffic_data', 10)
         
         self.command_subscriber_ = self.create_subscription(
-            String,
+            LightCommand,
             '/light_commands',
             self.handle_light_command,
             10)
         
+        self.intersection_id = self.get_parameter('intersection_id').get_parameter_value().string_value
+        
+        # Add a parameter callback
+        self.add_on_set_parameters_callback(self.parameter_callback)
+
         if not self.start_sumo():
             self.get_logger().error("Falha ao iniciar o SUMO. A desligar o nó.")
             self.destroy_node()
@@ -36,19 +41,22 @@ class BridgeNode(Node):
         self.timer = self.create_timer(0.1, self.simulation_step)
         self.get_logger().info("Nó 'bridge_node' iniciado e conectado ao SUMO.")
 
-    def handle_light_command(self, msg):
-        self.get_logger().info(f'Recebido comando: "{msg.data}"')
-        try:
-            traffic_light_id, new_state = msg.data.split(',')
-            
-            if traffic_light_id in traci.trafficlight.getIDList():
-                traci.trafficlight.setRedYellowGreenState(traffic_light_id.strip(), new_state.strip())
-                self.get_logger().info(f"Estado do semáforo '{traffic_light_id}' alterado para '{new_state}'.")
-            else:
-                self.get_logger().warn(f"Semáforo com ID '{traffic_light_id}' não encontrado na simulação.")
+    def parameter_callback(self, params):
+        for param in params:
+            if param.name == 'intersection_id':
+                self.intersection_id = param.value
+                self.get_logger().info(f"Intersection ID updated to: {self.intersection_id}")
+        return rclpy.parameter.ParameterValue()
 
-        except ValueError:
-            self.get_logger().error(f"Comando mal formatado: '{msg.data}'. Formato esperado: 'ID,ESTADO'.")
+    def handle_light_command(self, msg):
+        self.get_logger().info(f'Recebido comando: ID={msg.traffic_light_id}, Estado={msg.new_state}')
+        try:
+            if msg.traffic_light_id in traci.trafficlight.getIDList():
+                traci.trafficlight.setRedYellowGreenState(msg.traffic_light_id.strip(), msg.new_state.strip())
+                self.get_logger().info(f"Estado do semáforo '{msg.traffic_light_id}' alterado para '{msg.new_state}'.")
+            else:
+                self.get_logger().warn(f"Semáforo com ID '{msg.traffic_light_id}' não encontrado na simulação.")
+
         except traci.TraCIException as e:
             self.get_logger().error(f"Erro no Traci ao tentar alterar o semáforo: {e}")
 
@@ -78,12 +86,11 @@ class BridgeNode(Node):
     def simulation_step(self):
         try:
             traci.simulationStep()
-            intersection_id = self.get_parameter('intersection_id').get_parameter_value().string_value
-            vehicle_count, vehicle_ids = self.get_vehicle_data(intersection_id)
+            vehicle_count, vehicle_ids = self.get_vehicle_data(self.intersection_id)
             average_speed = self.get_average_speed(vehicle_ids)
             
             msg = TrafficData()
-            msg.intersection_id = intersection_id
+            msg.intersection_id = self.intersection_id
             msg.vehicle_count = vehicle_count
             msg.average_speed = average_speed
             msg.vehicle_ids = vehicle_ids

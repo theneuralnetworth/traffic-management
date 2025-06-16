@@ -1,0 +1,6 @@
+src/sumo_ros_bridge_py/build/*
+src/sumo_ros_bridge_py/install/*
+src/sumo_ros_bridge_py/log/*
+src/sumo_ros_bridge/build/*
+src/sumo_ros_bridge/install/*
+src/sumo_ros_bridge/log/*
