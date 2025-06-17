@@ -17,10 +17,6 @@ This project aims to build an intelligent traffic light control system using a d
 - **Purpose:** SPADE-based agent system that subscribes to ROS2 data from SUMO.
 - **Functionality:** Makes decisions (e.g., when to switch traffic lights) and publishes commands to ROS2 topics for SUMO to consume.
 
-### 3. multi_agent_launch
-
-- **Purpose:** Launch configuration to start the bridge and all agent nodes.
-- **Functionality:** Uses ROS 2 launch system to orchestrate the simulation.
 
 ## Nodes
 
