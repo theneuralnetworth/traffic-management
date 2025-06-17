@@ -10,19 +10,16 @@ class TrafficLightAgent(BaseAgent):
 
     class ControlLightBehaviour(PeriodicBehaviour):
         async def run(self):
+            """Cycles the traffic light state. ie. Green -> Yellow -> Red -> Green -> ..."""
             self.agent.current_phase = traci.trafficlight.getPhase(self.agent.sumo_id)
-            self.cycle_light_phase()
+            phases = traci.trafficlight.getCompleteRedYellowGreenDefinition(
+                self.agent.tl_id
+            )[0].phases
+            next_phase = (self.current_phase + 1) % len(phases)
+            traci.trafficlight.setPhase(self.agent.tl_id, next_phase)
 
-    def cycle_light_phase(self):
-        """Cycles the traffic light state. ie. Green -> Yellow -> Red -> Green -> ..."""
-        phases = traci.trafficlight.getCompleteRedYellowGreenDefinition(
-            self.agent.tl_id
-        )[0].phases
-        next_phase = (self.current_phase + 1) % len(phases)
-        traci.trafficlight.setPhase(self.agent.tl_id, next_phase)
-
-        # Publish the new state to MQTT
-        self.mqtt.publish(f"traffic_light/{self.jid.local}/state", next_phase)
+            # Publish the new state to MQTT
+            self.mqtt.publish(f"traffic_light/{self.jid.local}/state", next_phase)
 
     async def setup(self):
         self.setup_mqtt()
