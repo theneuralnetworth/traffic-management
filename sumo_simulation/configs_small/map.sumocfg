@@ -1,5 +1,0 @@
-<configuration>
-  <input>
-    <net-file value="map.net.xml"/>
-  </input>
-</configuration>
