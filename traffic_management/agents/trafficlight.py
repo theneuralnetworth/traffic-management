@@ -1,50 +1,30 @@
 from traffic_management.agents.base import BaseAgent
 from spade.behaviour import PeriodicBehaviour
-from enum import Enum
-from traffic_management.agents.vehicles import TrafficLightStatus
-from traffic_management.agents.simulation import ClockTickMessage
-
-
-class LightState(Enum):
-    RED = "red"
-    GREEN = "green"
-    YELLOW = "yellow"
+import traci
 
 
 class TrafficLightAgent(BaseAgent):
-    def __init__(self, id: str):
+    def __init__(self, id: str, sumo_id: str = None):
         super().__init__(id=id)
-        self.light_state = LightState.RED
+        self.sumo_id = sumo_id
 
     class ControlLightBehaviour(PeriodicBehaviour):
         async def run(self):
-            match self.agent.light_state:
-                case LightState.RED:
-                    self.agent.set_light_state(LightState.GREEN)
-                case LightState.GREEN:
-                    self.agent.set_light_state(LightState.YELLOW)
-                case LightState.YELLOW:
-                    self.agent.set_light_state(LightState.RED)
-                case _:
-                    self.agent.set_light_state(LightState.RED)
-            print(
-                f"[{self.agent.name}] Light changed to {self.agent.light_state.value}."
-            )
+            self.agent.current_phase = traci.trafficlight.getPhase(self.agent.sumo_id)
+            self.cycle_light_phase()
 
-            await self.send(
-                TrafficLightStatus().build_message(
-                    to=f"vehicle@{self.agent.jid.domain}",
-                    body=self.agent.light_state.value,
-                )
-            )
+    def cycle_light_phase(self):
+        """Cycles the traffic light state. ie. Green -> Yellow -> Red -> Green -> ..."""
+        phases = traci.trafficlight.getCompleteRedYellowGreenDefinition(
+            self.agent.tl_id
+        )[0].phases
+        next_phase = (self.current_phase + 1) % len(phases)
+        traci.trafficlight.setPhase(self.agent.tl_id, next_phase)
 
-    def set_light_state(self, state: LightState):
-        self.light_state = state
-        self.mqtt.publish(f"traffic_light/{self.jid.local}/state", state.value)
+        # Publish the new state to MQTT
+        self.mqtt.publish(f"traffic_light/{self.jid.local}/state", next_phase)
 
     async def setup(self):
         self.setup_mqtt()
-        self.light_state = LightState.RED
         print(f"[{self.name}] Traffic Light agent started.")
-        self.add_behaviour(self.ClockTickReceiveBehaviour(), ClockTickMessage())
-        self.add_behaviour(self.ControlLightBehaviour(period=5))
+        self.add_behaviour(self.ControlLightBehaviour(period=10))
