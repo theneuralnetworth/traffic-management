@@ -1,0 +1,5 @@
+<configuration>
+  <input>
+    <net-file value="my_city.net.xml"/>
+  </input>
+</configuration>

@@ -20,7 +20,7 @@ def get_vehicles_at_intersection(junction_id):
 
 def run_simulation():
     sumo_binary = "sumo-gui"
-    config_path = "intersection.sumocfg"
+    config_path = "map.sumocfg"
     
     sumo_cmd = [sumo_binary, "-c", config_path]
 

@@ -15,7 +15,7 @@ class BridgeNode(Node):
         sim_cfg_path = os.path.join(
             get_package_share_directory('sumo_ros_bridge_py'),
             'sim',
-            'intersection.sumocfg'
+            'map.sumocfg'
         )
         self.declare_parameter('sumo_cfg_path', sim_cfg_path)
         self.declare_parameter('intersection_id', 'J4')
@@ -106,7 +106,15 @@ class BridgeNode(Node):
             msg.vehicle_road_ids = [traci.vehicle.getRoadID(vid) for vid in vehicle_ids]
             
             self.publisher_.publish(msg)
-            self.get_logger().info(f'Published: id={msg.intersection_id}, count={msg.vehicle_count}, speed={msg.average_speed:.2f} m/s')
+            self.get_logger().info(
+                f'Published: id={msg.intersection_id}, count={msg.vehicle_count}, speed={msg.average_speed:.2f} m/s, '
+                f'Vehicle IDs: {msg.vehicle_ids}, '
+                f'Vehicle Types: {msg.vehicle_types}, '
+                f'Vehicle Speeds: {msg.vehicle_speeds}, '
+                f'Vehicle Accels: {msg.vehicle_accels}, '
+                f'Vehicle Decels: {msg.vehicle_decels}, '
+                f'Vehicle Distances: {msg.vehicle_distances}'
+            )
 
         except Exception as e:
             self.get_logger().error(f"Exception in simulation_step: {e}")
