@@ -7,12 +7,10 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.13"
-spade = "4.0.3"
-slixmpp = "1.9.1"
-pyjabber = "0.2"
+spade = "^4.1.0"
 requests = "^2.32.3"
 traci = "^1.23.1"
-
+paho-mqtt = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core"]

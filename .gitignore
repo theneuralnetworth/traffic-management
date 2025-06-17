@@ -1,1 +1,7 @@
 .vscode
+__pycache__
+*.pyc
+.venv
+ros_nodes/build/*
+ros_nodes/install/*
+ros_nodes/log/*

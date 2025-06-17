@@ -1,0 +1,14 @@
+string intersection_id
+int32 vehicle_count
+float32 average_speed
+string[] vehicle_ids
+string[] vehicle_types
+float32[] vehicle_speeds
+float32[] vehicle_accels
+float32[] vehicle_decels
+float32[] vehicle_distances
+float32[] vehicle_waiting_times
+bool[] vehicle_is_stopped
+string[] vehicle_positions
+string[] vehicle_lane_ids
+string[] vehicle_road_ids 

@@ -1,5 +1,5 @@
 services:
-  prosody:
+  xmpp:
     image: prosody/prosody:latest
     platform: linux/amd64
     container_name: xmpp
@@ -7,7 +7,71 @@ services:
       - "5222:5222"
     environment:
       XMPP_DOMAIN: localhost
-      XMPP_USER: agent
+      XMPP_USER: |
+        trafficlight:password
+        vehicle:password
       XMPP_PASSWORD: password
     volumes:
-      - ./prosody.cfg.lua:/etc/prosody/prosody.cfg.lua:ro
+      - prosody_data:/var/lib/prosody
+      - ./config/prosody/prosody.cfg.lua:/etc/prosody/prosody.cfg.lua:ro
+    healthcheck:
+      test: ["CMD", "sleep", "3"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mqtt:
+    image: eclipse-mosquitto:latest
+    platform: linux/amd64
+    container_name: mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/var/lib/mosquitto
+    healthcheck:
+      test: ["CMD", "mosquitto_pub", "-t", "healthcheck", "-m", "ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  tfm:
+    build:
+      context: .
+    container_name: tfm
+    environment:
+      XMPP_HOST: xmpp
+      MQTT_HOST: mqtt
+    depends_on:
+      xmpp:
+        condition: service_healthy
+      mqtt:
+        condition: service_healthy
+
+  sumo:
+    image: ghcr.io/eclipse-sumo/sumo:latest
+    platform: linux/amd64
+    container_name: sumo
+    command: sumo -c /sumo/simple.sumocfg
+    ports:
+      - "8813:8813"
+    volumes:
+      - ./config/sumo:/sumo
+
+  ros:
+    build:
+      context: .
+      dockerfile: Dockerfile.ros
+    container_name: ros
+    environment:
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_DOMAIN_ID=0
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/root/workspace
+
+volumes:
+  prosody_data:
+  mosquitto_data:

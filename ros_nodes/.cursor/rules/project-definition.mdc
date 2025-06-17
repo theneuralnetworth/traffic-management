@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Cursor Project Context
+
+## Project Name
+Multi-Agent Traffic Light Controller with SUMO, ROS2, and SPADE
+
+## Goal
+Build an intelligent traffic light control system that uses a distributed multi-agent setup to dynamically adjust traffic light states based on real-time simulation data from SUMO. The system is modular, extensible, and based on ROS 2 for integration with IoT systems.
+
+## Core Components
+
+### 1. sumo_ros_bridge
+- Bridge between SUMO and ROS2 using Traci.
+- Parses simulation data (like vehicle count or positions).
+- Publishes data to ROS2 topics for other agents to consume.
+- Executables: `bridge_node`, `trafficc_data_subscriber`.
+
+### 2. decision_publisher
+- SPADE-based agent system that subscribes to ROS2 data from SUMO.
+- Makes decisions (e.g., when to switch traffic lights).
+- Publishes commands to ROS2 topics for SUMO to consume.
+
+### 3. multi_agent_launch
+- Launch configuration to start the bridge and all agent nodes.
+- Uses ROS 2 launch system to orchestrate the simulation.
+
+## Technologies Used
+- ROS 2 (Humble)
+- SUMO with Traci (Python interface)
+- SPADE (for multi-agent communication)
+- Python 3
+- Distrobox (to run ROS2 inside a containerized dev environment)
+- VSCode Cursor (AI-assisted development)
+
+## Key Objectives
+- Implement real-time traffic light control with agent collaboration.
+- Ensure full bidirectional communication between SUMO and ROS 2.
+- Use agents to make autonomous traffic optimization decisions.
+- Allow the system to scale across multiple intersections and agents.
+
+## Notes
+- Bridge nodes should be idempotent and tolerate communication delays.
+- Decision nodes may later integrate reinforcement learning logic.
+- Remember to always apply your changes.
+
