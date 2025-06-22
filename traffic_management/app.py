@@ -7,7 +7,7 @@ from traffic_management.agents.car_agent import CarAgent
 
 
 # --- SUMO Configuration ---
-SUMO_CMD = ["sumo-gui", "--start", "-c", "config/sumo/map/map.sumocfg"]
+SUMO_CMD = ["sumo-gui", "-c", "config/sumo/map/map.sumocfg"]
 
 
 # --- Load routes from a .rou.xml file ---
@@ -47,13 +47,16 @@ def generate_car_agents(num_cars: int, routes: list) -> list:
 
 
 async def main():
-    traci.start(SUMO_CMD)
+    conn = traci.connect(port=8813, label="main")
 
-    traffic_light_ids = traci.trafficlight.getIDList()
+    conn.simulationStep()
+
+    traffic_light_ids = conn.trafficlight.getIDList()
     print(f"[MAIN] Found traffic lights: {traffic_light_ids}")
     agents = generate_traffic_light_agents(traffic_light_ids)
 
-    routes = load_routes("maps/trips.trips.xml")
+    routes = conn.route.getIDList()
+    routes = load_routes("config/sumo/map/trips.trips.xml")
     car_agents = generate_car_agents(5, routes)  # Create 5 car agents
     agents.extend(car_agents)
 
@@ -72,14 +75,14 @@ async def main():
     try:
         step = 0
         while step < 5000:
-            traci.simulationStep()  # Advance simulation by one step
+            conn.simulationStep()  # Advance simulation by one step
             await asyncio.sleep(0.1)  # Allow async behaviors to run
             step += 1
     except KeyboardInterrupt:
         print("[MAIN] Simulation interrupted.")
 
     await spade.wait_until_finished(agents)
-    traci.close()
+    conn.close()
 
 
 if __name__ == "__main__":
