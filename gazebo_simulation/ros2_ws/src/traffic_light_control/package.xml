@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+      <name>traffic_light_control</name>
+  <version>0.1.0</version>
+  <description>Plugin to control the stop_light model in Gazebo via ROS 2</description>
+  <maintainer email="jurafinha123@gmail.com">Joana</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>gazebo_ros</depend>
+  <depend>gazebo</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <gazebo_ros plugin="libtraffic_light_plugin.so"/>>
+  </export>
+</package>
