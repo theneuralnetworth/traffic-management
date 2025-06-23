@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
   <world name="TrafficWorld">
-
     <!-- Sun and ground -->
     <include>
       <uri>model://sun</uri>
@@ -10,11 +9,74 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <!-- Stop light -->
+    <!-- Stop light 0 -->
     <include>
       <uri>model://stop_light</uri>
-      <pose>2 2 2 0 0 0</pose>
+      <name>stop_light_0</name>
+      <pose>0 0 2 0 0 0</pose>
+      <plugin name="traffic_light_control_0" filename="libtraffic_light_plugin.so">
+        <ros>
+          <namespace>/stop_light_0</namespace>
+          <node_name>stop_light_0_node</node_name>
+        </ros>
+        <rosTopic>/stop_light_0/color</rosTopic>
+      </plugin>
     </include>
 
+    <!-- Stop light 1 -->
+    <include>
+      <uri>model://stop_light</uri>
+      <name>stop_light_1</name>
+      <pose>2 0 2 0 0 0</pose>
+      <plugin name="traffic_light_control_1" filename="libtraffic_light_plugin.so">
+        <ros>
+          <namespace>/stop_light_1</namespace>
+          <node_name>stop_light_1_node</node_name>
+        </ros>
+        <rosTopic>/stop_light_1/color</rosTopic>
+      </plugin>
+    </include>
+
+    <!-- Stop light 2 -->
+    <include>
+      <uri>model://stop_light</uri>
+      <name>stop_light_2</name>
+      <pose>4 0 2 0 0 0</pose>
+      <plugin name="traffic_light_control_2" filename="libtraffic_light_plugin.so">
+        <ros>
+          <namespace>/stop_light_2</namespace>
+          <node_name>stop_light_2_node</node_name>
+        </ros>
+        <rosTopic>/stop_light_2/color</rosTopic>
+      </plugin>
+    </include>
+
+    <!-- Stop light 3 -->
+    <include>
+      <uri>model://stop_light</uri>
+      <name>stop_light_3</name>
+      <pose>6 0 2 0 0 0</pose>
+      <plugin name="traffic_light_control_3" filename="libtraffic_light_plugin.so">
+        <ros>
+          <namespace>/stop_light_3</namespace>
+          <node_name>stop_light_3_node</node_name>
+        </ros>
+        <rosTopic>/stop_light_3/color</rosTopic>
+      </plugin>
+    </include>
+
+    <!-- Stop light 4 -->
+    <include>
+      <uri>model://stop_light</uri>
+      <name>stop_light_4</name>
+      <pose>8 0 2 0 0 0</pose>
+      <plugin name="traffic_light_control_4" filename="libtraffic_light_plugin.so">
+        <ros>
+          <namespace>/stop_light_4</namespace>
+          <node_name>stop_light_4_node</node_name>
+        </ros>
+        <rosTopic>/stop_light_4/color</rosTopic>
+      </plugin>
+    </include>
   </world>
 </sdf>

@@ -88,10 +88,11 @@
     </link>
 <!-- ====================================================== -->
     <!-- Plugin that connects stop_light to ROS 2 -->
-    <plugin name="traffic_light_control" filename="libtraffic_light_plugin.so">
-      <!-- ROS 2 topic to subscribe for color commands -->
+    <!--
+    <plugin name="traffic_light_control" filename="libtraffic_light_plugin.so">     
       <rosTopic>/stop_light/color</rosTopic>
     </plugin>
+    -->
     <!-- ====================================================== --> 
  </model>
 </sdf>

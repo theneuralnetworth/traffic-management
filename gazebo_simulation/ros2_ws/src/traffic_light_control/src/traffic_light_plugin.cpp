@@ -20,7 +20,7 @@ namespace gazebo
     {
       this->model_ = model;
       this->world_name_ = model->GetWorld()->Name();
-      this->model_name_ = model->GetName();  // "stop_light"
+      this->model_name_ = model->GetName();  // e.g. stop_light_0
       this->link_name_  = "link";
 
       // Set up Gazebo transport
@@ -28,16 +28,21 @@ namespace gazebo
       this->gz_node_->Init(this->world_name_);
       this->vis_pub_ = this->gz_node_->Advertise<msgs::Visual>("~/visual");
 
-      // Create ROS 2 node & sub
-      this->ros_node_ = gazebo_ros::Node::Get(sdf, "traffic_light_node");
+      // Create a unique ROS 2 node using model name
+      std::string node_name = this->model_name_ + "_node";
+      this->ros_node_ = gazebo_ros::Node::Get(sdf, node_name);
+
+      // Topic from SDF or default
       std::string topic = "/stop_light/color";
       if (sdf->HasElement("rosTopic"))
         topic = sdf->Get<std::string>("rosTopic");
+
       this->sub_ = this->ros_node_->create_subscription<std_msgs::msg::String>(
         topic, 10,
         std::bind(&TrafficLightPlugin::OnRosMsg, this, std::placeholders::_1));
 
-      RCLCPP_INFO(this->ros_node_->get_logger(), "TrafficLightPlugin loaded");
+      RCLCPP_INFO(this->ros_node_->get_logger(),
+                  "TrafficLightPlugin loaded for %s", this->model_name_.c_str());
     }
 
   private:
@@ -73,7 +78,6 @@ namespace gazebo
       }
     }
 
-    // Members
     physics::ModelPtr model_;
     std::string world_name_, model_name_, link_name_;
     transport::NodePtr gz_node_;
