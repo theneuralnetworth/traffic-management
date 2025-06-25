@@ -1,89 +1,82 @@
-from spade.agent import Agent
-from spade.behaviour import OneShotBehaviour, CyclicBehaviour
-from spade.message import Message
-
 import traci
-import random
 import asyncio
+import xml.etree.ElementTree as ET
+from traffic_management.agents.trafficlight import TrafficLightAgent
+from traffic_management.agents.car_agent import CarAgent
 
-class VehicleAgentLogic:
-    def __init__(self, veh_id):
-        self.id = veh_id
-        self.total_wait_time = 0
-        self.current_wait = 0
-        self.lane = None
-        self.stopped = False
+# --- SUMO Configuration ---
+SUMO_CMD = ["sumo-gui", "-c", "../config/sumo/map/map.sumocfg"]
 
-    def update(self):
-        if self.id not in traci.vehicle.getIDList():
-            return None
+# --- Load routes from a .rou.xml file ---
+def load_routes(filename):
+    """
+    Parses a SUMO .rou.xml file and extracts the list of routes.
+    Each route is returned as a tuple: (vehicle_id, [edge1, edge2, ...])
+    """
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    routes = []
+    for vehicle in root.findall("vehicle"):
+        veh_id = vehicle.attrib["id"]
+        route_elem = vehicle.find("route")
+        if route_elem is not None:
+            edges = route_elem.attrib["edges"].split()
+            routes.append((veh_id, edges))
+    return routes
 
-        speed = traci.vehicle.getSpeed(self.id)
-        lane_id = traci.vehicle.getLaneID(self.id)
-        self.lane = lane_id
+async def main():
+    # Start the SUMO simulation (TraCI connection)
+    traci.start(SUMO_CMD)
 
-        if speed < 0.1:
-            self.current_wait += 1
-            self.stopped = True
-        else:
-            self.total_wait_time += self.current_wait
-            self.current_wait = 0
-            self.stopped = False
+    # --- Create traffic light agents ---
+    traffic_light_ids = traci.trafficlight.getIDList()
+    print(f"[MAIN] Found traffic lights: {traffic_light_ids}")
 
-        tls_info = traci.vehicle.getNextTLS(self.id)
-        if tls_info:
-            tls_id, dist, light_state, lane = tls_info[0]
+    agents = []
 
-            if dist < 50 and light_state in ['r', 'y']:
-                return (tls_id, lane_id, self.current_wait)
+    tls_agents_map = {}
+    for i, tl_id in enumerate(traffic_light_ids):
+        jid = f"semaforo{i}@localhost"
+        password = "password"
+        agent = TrafficLightAgent(jid, password, tl_id)
+        try:
+            await agent.start(auto_register=True)
+            tls_agents_map[tl_id] = jid
+            print(f"[MAIN] ✅ Started agent {jid} for traffic light {tl_id}")
+            agents.append(agent)
+        except Exception as e:
+            print(f"[MAIN] ❌ Failed to start agent {jid} for {tl_id}: {e}")
 
-        return None
+    # --- Load pre-generated routes ---
+    routes = load_routes("../config/sumo/map/routes.rou.xml")
 
-    def get_total_wait_time(self):
-        return self.total_wait_time + self.current_wait
+    # --- Create car agents (each adds a vehicle to the simulation) ---
+    for i in range(5):
+        jid = f"car{i}@localhost"
+        password = "password"
+        car_id = f"car{i}"
+        agent = CarAgent(jid, password, car_id, routes, tls_agents_map)  # Pass routes to the agent
+        try:
+            await agent.start(auto_register=True)
+            print(f"[MAIN] ✅ Started agent {jid} for vehicle {car_id}")
+            agents.append(agent)
+        except Exception as e:
+            print(f"[MAIN] ❌ Failed to start agent {jid} for vehicle {car_id}: {e}")
 
+    # --- Run the simulation loop ---
+    try:
+        step = 0
+        while step < 5000:
+            traci.simulationStep()          # Advance simulation by one step
+            await asyncio.sleep(0.1)        # Allow async behaviors to run
+            step += 1
+    except KeyboardInterrupt:
+        print("[MAIN] Simulation interrupted.")
 
-class CarAgent(Agent):
-    def __init__(self, jid, password, car_id, routes, tls_agents_map):
-        super().__init__(jid, password)
-        self.car_id = car_id
-        self.routes = routes  # List of (vehicle_id, [edge1, edge2, ...])
-        self.tls_agents_map = tls_agents_map  # Dict[tls_id: str -> jid: str]
-        self.logic = VehicleAgentLogic(car_id)
+    # --- Shutdown all agents and close simulation ---
+    for agent in agents:
+        await agent.stop()
+    traci.close()
 
-    class CreateVehicleBehaviour(OneShotBehaviour):
-        async def run(self):
-            print(f"[{self.agent.car_id}] Creating vehicle...")
-
-            _, route = random.choice(self.agent.routes)
-            route_id = f"route_{self.agent.car_id}"
-
-            traci.route.add(route_id, route)
-            traci.vehicle.add(self.agent.car_id, route_id)
-
-            print(f"[{self.agent.car_id}] Vehicle created from {route[0]} to {route[-1]}")
-
-    class MonitorBehaviour(CyclicBehaviour):
-        async def run(self):
-            result = self.agent.logic.update()
-            if result:
-                tls_id, lane_id, wait = result
-                if tls_id in self.agent.tls_agents_map:
-                    receiver_jid = self.agent.tls_agents_map[tls_id]
-                    msg = Message(to=receiver_jid)
-                    msg.set_metadata("performative", "inform")
-                    msg.set_metadata("type", "wait-notification")
-                    msg.body = f"{self.agent.car_id}|{lane_id}|{wait}"
-                    await self.send(msg)
-
-                    msg_request = Message(to=receiver_jid)
-                    msg_request.set_metadata("performative", "request")
-                    msg_request.set_metadata("type", "change-phase-request")
-                    msg_request.body = f"{self.agent.car_id}|{lane_id}"
-                    await self.send(msg_request)
-            await asyncio.sleep(1)
-
-    async def setup(self):
-        print(f"[{self.car_id}] CarAgent started.")
-        self.add_behaviour(self.CreateVehicleBehaviour())
-        self.add_behaviour(self.MonitorBehaviour())
+if __name__ == "__main__":
+    asyncio.run(main())
