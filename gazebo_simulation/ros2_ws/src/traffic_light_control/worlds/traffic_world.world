@@ -19,7 +19,7 @@
           <namespace>/stop_light_0</namespace>
           <node_name>stop_light_0_node</node_name>
         </ros>
-        <rosTopic>/stop_light_0/color</rosTopic>
+        <traffic_light_id>0</traffic_light_id>
       </plugin>
     </include>
 
@@ -33,7 +33,7 @@
           <namespace>/stop_light_1</namespace>
           <node_name>stop_light_1_node</node_name>
         </ros>
-        <rosTopic>/stop_light_1/color</rosTopic>
+        <traffic_light_id>1</traffic_light_id>
       </plugin>
     </include>
 
@@ -47,7 +47,7 @@
           <namespace>/stop_light_2</namespace>
           <node_name>stop_light_2_node</node_name>
         </ros>
-        <rosTopic>/stop_light_2/color</rosTopic>
+        <traffic_light_id>2</traffic_light_id>
       </plugin>
     </include>
 
@@ -61,7 +61,7 @@
           <namespace>/stop_light_3</namespace>
           <node_name>stop_light_3_node</node_name>
         </ros>
-        <rosTopic>/stop_light_3/color</rosTopic>
+        <traffic_light_id>3</traffic_light_id>
       </plugin>
     </include>
 
@@ -75,7 +75,7 @@
           <namespace>/stop_light_4</namespace>
           <node_name>stop_light_4_node</node_name>
         </ros>
-        <rosTopic>/stop_light_4/color</rosTopic>
+        <traffic_light_id>4</traffic_light_id>
       </plugin>
     </include>
   </world>
