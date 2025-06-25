@@ -31,7 +31,17 @@ services:
       - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - mosquitto_data:/var/lib/mosquitto
     healthcheck:
-      test: ["CMD", "mosquitto_pub", "-t", "healthcheck", "-m", "ok"]
+      test:
+        [
+          "CMD",
+          "mosquitto_pub",
+          "-t",
+          "healthcheck",
+          "-m",
+          "ok",
+          "-i",
+          "healthcheck-publisher",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -43,6 +53,7 @@ services:
     environment:
       XMPP_HOST: xmpp
       MQTT_HOST: mqtt
+      SUMO_HOST: host.docker.internal
     depends_on:
       xmpp:
         condition: service_healthy
@@ -53,7 +64,8 @@ services:
     image: ghcr.io/eclipse-sumo/sumo:latest
     platform: linux/amd64
     container_name: sumo
-    command: sumo -c /sumo/simple.sumocfg
+    restart: always
+    command: sumo --verbose -c /sumo/map/map.sumocfg
     ports:
       - "8813:8813"
     volumes:
@@ -64,6 +76,8 @@ services:
       context: .
       dockerfile: Dockerfile.ros
     container_name: ros
+    profiles:
+      - ignore
     environment:
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
       - ROS_DOMAIN_ID=0

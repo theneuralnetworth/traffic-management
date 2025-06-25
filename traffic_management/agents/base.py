@@ -1,4 +1,5 @@
 import os
+import traci
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour
 import paho.mqtt.client as mqtt
@@ -31,3 +32,7 @@ class BaseAgent(Agent):
         self.mqtt.on_message = self.on_mqtt_message
 
         self.mqtt.connect(MQTT_HOST, MQTT_PORT, 60)
+
+    def connect_to_sumo(self, label: str = "main"):
+        self.sumo_conn = traci.getConnection(label)
+        print(f"[{self.name}] Connected to SUMO with label '{label}'")

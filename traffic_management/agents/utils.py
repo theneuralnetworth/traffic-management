@@ -1,12 +1,30 @@
-def get_random_location() -> tuple[float, float]:
-    """Generate a random location within a defined area."""
-    import random
+import traci
+import random
 
-    x = round(random.uniform(0, 100), 3)
-    y = round(random.uniform(0, 100), 3)
-    return (x, y)
+
+def get_random_sumo_position(connection) -> tuple[float, float]:
+    edges = [e for e in connection.edge.getIDList() if not e.startswith(":")]
+    edge_id = random.choice(edges)
+
+    edge_lanes = connection.edge.getLaneNumber(edge_id)
+    lane_index = random.randint(0, edge_lanes - 1)
+    lane_position = random.uniform(
+        0, connection.lane.getLength(edge_id + f"_{lane_index}")
+    )
+    x, y = connection.simulation.convert2D(edge_id, lane_position, lane_index)
+
+    return x, y
 
 
 if __name__ == "__main__":
-    location = get_random_location()
-    print(f"Random location generated: {location}")
+    conn = traci.connect()
+
+    for i in range(10):
+        location = get_random_sumo_position(conn)
+
+        conn.poi.add(
+            poiID=f"random_location_{i}",
+            x=location[0],
+            y=location[1],
+            color=(255, 0, 0, 255),
+        )
