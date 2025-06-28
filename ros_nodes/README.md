@@ -77,7 +77,7 @@ This project aims to build an intelligent traffic light control system using a d
 ## How to Use
 
 1. **Setup Environment:**
-
+   - Install support for MQTT (traffic_data_subscriber node) by running "pip install -r requirements.txt"
    - Ensure ROS 2 and SUMO are installed and configured.
    - Set the `SUMO_HOME` environment variable. This variable should point to the root directory of your SUMO installation, which contains subdirectories like `bin`, `tools`, and `data`. For example, if SUMO is installed in `/usr/local/share/sumo`, set it using:
      ```bash
