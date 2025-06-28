@@ -6,7 +6,9 @@ from spade.message import Message
 from spade.template import Template
 from spade.behaviour import CyclicBehaviour, OneShotBehaviour
 from traffic_management.agents.base import BaseAgent
-from traffic_management.agents.utils import get_random_location
+from traffic_management.agents.utils import (
+    get_random_sumo_position,
+)
 from traffic_management.contact_book import (
     MEDICAL_AGENTS,
     POLICE_AGENTS,
@@ -46,7 +48,7 @@ class AmbulanceDistanceMessage(Template):
         return msg
 
 
-class EmergencyDispatch(BaseAgent):
+class EmergencyDispatchAgent(BaseAgent):
     def __init__(self, id: str, random_seed: tuple[float, float] = (5, 15)):
         self.random_seed = random_seed
         super().__init__(id=id)
@@ -75,8 +77,10 @@ class EmergencyDispatch(BaseAgent):
         self.add_behaviour(self.EmergencyRequestBehaviour())
 
 
-class Ambulance(BaseAgent):
+class AmbulanceAgent(BaseAgent):
     def __init__(self, id: str):
+        self.on_call = False
+        self.location = None
         super().__init__(id=id)
 
     class HandleEmergencyRequestBehaviour(CyclicBehaviour):
@@ -118,16 +122,28 @@ class Ambulance(BaseAgent):
                 self.agent.on_call = True
                 self.agent.location = self.agent.emergency_location
 
+    def add_to_sumo(self):
+        try:
+            self.sumo_conn.vehicle.add(
+                vehID=self.jid.local,
+                routeID="",
+                typeID="ambulance",
+            )
+            print(f"[{self.name}] Ambulance added to SUMO.")
+        except Exception as e:
+            print(f"[{self.name}] Error adding ambulance to SUMO: {e}")
+
     async def setup(self):
-        self.on_call = False
-        self.location = get_random_location()
+        self.connect_to_sumo()
+        # self.location = get_random_sumo_position(self.sumo_conn)
+        self.add_to_sumo()
         print(f"[{self.name}] Ambulance agent started at location {self.location}.")
         self.add_behaviour(
             self.HandleEmergencyRequestBehaviour(), EmergencyRequestMessage()
         )
 
 
-class Police(BaseAgent):
+class PoliceAgent(BaseAgent):
     def __init__(self, id: str):
         super().__init__(id=id)
 
