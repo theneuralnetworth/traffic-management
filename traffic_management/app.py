@@ -32,16 +32,16 @@ def generate_traffic_light_agents(traffic_light_ids: tuple, tls_agents_map: dict
     for i, tl_id in enumerate(traffic_light_ids):
         jid = f"traffic-light-{i}"
         agent = TrafficLightAgent(jid, tl_id)
-        tls_agents_map[tl_id] = jid
+        tls_agents_map[tl_id] = str(agent.jid)
         traffic_light_agents.append(agent)
     return traffic_light_agents
 
 
-def generate_car_agents(num_cars: int, tls_agents_map: dict) -> list:
+def generate_car_agents(num_cars: int, routes, tls_agents_map: dict) -> list:
     car_agents = []
     for i in range(num_cars):
         car_id = f"car{i}"
-        agent = CarAgent(car_id, tls_agents_map)
+        agent = CarAgent(car_id, routes, tls_agents_map)
         car_agents.append(agent)
     return car_agents
 
@@ -70,17 +70,19 @@ async def main():
     agents.extend(traffic_light_agents)
 
     # Create emergency vehicle agents
-    emergency_agents = generate_emergency_vehicle_agents(num_ambulance=2, num_police=2)
-    agents.extend(emergency_agents)
+    # emergency_agents = generate_emergency_vehicle_agents(num_ambulance=2, num_police=2)
+    # agents.extend(emergency_agents)
 
-    car_agents = generate_car_agents(40, tls_agents_map)  # Create 40 car agents
+    routes = load_routes("../config/sumo/map/routes.rou.xml")
+
+    car_agents = generate_car_agents(40, routes, tls_agents_map)  # Create 40 car agents
     agents.extend(car_agents)
 
     # Start all agents
     try:
         await asyncio.wait_for(
             asyncio.gather(*(agent.start() for agent in agents)),
-            timeout=5,
+            timeout=15,
         )
     except asyncio.TimeoutError:
         print(

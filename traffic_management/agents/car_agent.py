@@ -29,7 +29,8 @@ class VehicleAgentLogic:
 
         # Retrieve current speed and lane
         speed = conn.vehicle.getSpeed(self.id)
-        lane_id = conn.vehicle.getLaneID(self.id)
+        raw_lane = conn.vehicle.getLaneID(self.id)
+        lane_id = raw_lane.lstrip(":-")
         self.lane = lane_id
 
         # Update waiting times based on speed
@@ -44,10 +45,10 @@ class VehicleAgentLogic:
         # Check the next traffic light ahead, if any
         tls_info = conn.vehicle.getNextTLS(self.id)
         if tls_info:
-            tls_id, dist, _, light_state = tls_info[0]
-            # If close to a red or yellow light, notify
+            tls_id, lane_index, dist, light_state = tls_info[0]
+
             if dist < 50 and light_state in ['r', 'y']:
-                return (tls_id, lane_id, self.current_wait, dist)
+                return tls_id, lane_id, self.current_wait, dist
 
         return None
 
@@ -57,10 +58,11 @@ class VehicleAgentLogic:
 
 
 class CarAgent(BaseAgent):
-    def __init__(self, car_id, tls_agents_map, conn_label="main"):
+    def __init__(self, car_id, routes, tls_agents_map, conn_label="main"):
         super().__init__(car_id)
         self.car_id = car_id  # store routes for dynamic or static use
         self.tls_agents_map = tls_agents_map
+        self.routes = routes
         self.conn_label = conn_label
         self.logic = VehicleAgentLogic(car_id, conn_label)
 
@@ -68,18 +70,7 @@ class CarAgent(BaseAgent):
         async def run(self):
             # Connect to the labeled SUMO instance
             conn = getConnection(self.agent.conn_label)
-            # Get list of edges from the network
-            all_edges = conn.edge.getIDList()
-            # Choose random start and end edges
-            from_edge = random.choice(all_edges)
-            to_edge = random.choice(all_edges)
-
-            # Compute a valid path dynamically
-            route_obj = conn.simulation.findRoute(from_edge, to_edge)
-            route = route_obj.edges
-            if not route:
-                # No valid route found, skip vehicle creation
-                return
+            vid, route = random.choice(self.agent.routes)
 
             route_id = f"route_{self.agent.car_id}"
             # Add the computed route and spawn the vehicle
