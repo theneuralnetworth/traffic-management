@@ -21,6 +21,7 @@ class BridgeNode(Node):
         self.declare_parameter('intersection_id', 'J4')
         
         self.publisher_ = self.create_publisher(TrafficData, '/traffic_data', 10)
+        self.light_command_publisher = self.create_publisher(LightCommand, '/traffic_light_data', 10)
         
         self.command_subscriber_ = self.create_subscription(
             LightCommand,
@@ -85,6 +86,7 @@ class BridgeNode(Node):
 
     def simulation_step(self):
         try:
+            # print(traci)
             traci.simulationStep()
             vehicle_count, vehicle_ids = self.get_vehicle_data(self.intersection_id)
             average_speed = self.get_average_speed(vehicle_ids)
@@ -106,6 +108,13 @@ class BridgeNode(Node):
             msg.vehicle_road_ids = [traci.vehicle.getRoadID(vid) for vid in vehicle_ids]
             
             self.publisher_.publish(msg)
+
+            ## light command publisher
+            light_command_msg = LightCommand()
+            light_command_msg.traffic_light_id = self.intersection_id
+            light_command_msg.new_state = traci.trafficlight.getRedYellowGreenState(self.intersection_id)
+            self.light_command_publisher.publish(light_command_msg)
+
             self.get_logger().info(
                 f'Published: id={msg.intersection_id}, count={msg.vehicle_count}, speed={msg.average_speed:.2f} m/s, '
                 f'Vehicle IDs: {msg.vehicle_ids}, '

@@ -5,6 +5,7 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(sumo_ros_bridge REQUIRED)
 
 ament_python_install_package(sumo_ros_bridge_py)
 

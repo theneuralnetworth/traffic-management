@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from sumo_ros_bridge.msg import TrafficData
+from sumo_ros_bridge.msg import TrafficData, LightCommand
+import paho.mqtt.publish as publish
 
 class TrafficDataSubscriber(Node):
     def __init__(self):
@@ -12,6 +13,13 @@ class TrafficDataSubscriber(Node):
             self.listener_callback,
             10)
         self.subscription
+        ## traffic light state sub
+        self.light_command_subscription = self.create_subscription(
+            LightCommand,
+            '/traffic_light_data',
+            self.traffic_light_data_listener_callback,
+            10)
+       
 
     def listener_callback(self, msg):
         self.get_logger().info(f'Received data: id={msg.intersection_id}, count={msg.vehicle_count}, speed={msg.average_speed:.2f} m/s')
@@ -20,6 +28,13 @@ class TrafficDataSubscriber(Node):
 
         # Log summary of received data
         self.get_logger().info(f'Total vehicles: {len(msg.vehicle_ids)}, Average speed: {msg.average_speed:.2f} m/s')
+    
+    def traffic_light_data_listener_callback(self, msg):
+        new_state = str(msg.new_state).upper()[0]
+        self.get_logger().info(f'Received traffic light data_: id={msg.traffic_light_id}, state={msg.new_state}_{new_state}')
+        new_state = str(msg.new_state).upper()[0]
+        publish.single("esp32/traffic_light", new_state, hostname="192.168.1.100")  # Use your broker's IP
+        
 
 def main(args=None):
     rclpy.init(args=args)
