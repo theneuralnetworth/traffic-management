@@ -41,5 +41,5 @@ cd gazebo_simulation/ros2_ws
    ```
 3. Publish light change command (e.g. change light 2 to red):
    ```bash
-   ros2 topic pub -1 /light_commands std_msgs/msg/String '{data: "2,red"}'
+   ros2 topic pub -1 /light_commands traffic_light_control/msg/LightCommand \ "{traffic_light_id: '2', new_state: 'red'}"
    ```

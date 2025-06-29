@@ -9,11 +9,67 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <!-- Stop light 0 -->
+    <!-- North–South road -->
+    <model name="road_ns">
+      <static>true</static>
+      <pose>0 0 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <pose>0 0 0.005 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>2 20 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0 0 0.005 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>2 20 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- East–West road -->
+    <model name="road_ew">
+      <static>true</static>
+      <pose>0 0 0 0 0 1.5708</pose>
+      <link name="link">
+        <visual name="visual">
+          <pose>0 0 0.005 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>2 20 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0 0 0.005 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>2 20 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- Stop light 0 (North) -->
     <include>
       <uri>model://stop_light</uri>
       <name>stop_light_0</name>
-      <pose>0 0 2 0 0 0</pose>
+      <pose>0 3 2 0 0 3.1416</pose>
       <plugin name="traffic_light_control_0" filename="libtraffic_light_plugin.so">
         <ros>
           <namespace>/stop_light_0</namespace>
@@ -23,11 +79,11 @@
       </plugin>
     </include>
 
-    <!-- Stop light 1 -->
+    <!-- Stop light 1 (East) -->
     <include>
       <uri>model://stop_light</uri>
       <name>stop_light_1</name>
-      <pose>2 0 2 0 0 0</pose>
+      <pose>3 0 2 0 0 1.5708</pose>
       <plugin name="traffic_light_control_1" filename="libtraffic_light_plugin.so">
         <ros>
           <namespace>/stop_light_1</namespace>
@@ -37,11 +93,11 @@
       </plugin>
     </include>
 
-    <!-- Stop light 2 -->
+    <!-- Stop light 2 (South) -->
     <include>
       <uri>model://stop_light</uri>
       <name>stop_light_2</name>
-      <pose>4 0 2 0 0 0</pose>
+      <pose>0 -3 2 0 0 0</pose>
       <plugin name="traffic_light_control_2" filename="libtraffic_light_plugin.so">
         <ros>
           <namespace>/stop_light_2</namespace>
@@ -51,11 +107,11 @@
       </plugin>
     </include>
 
-    <!-- Stop light 3 -->
+    <!-- Stop light 3 (West) -->
     <include>
       <uri>model://stop_light</uri>
       <name>stop_light_3</name>
-      <pose>6 0 2 0 0 0</pose>
+      <pose>-3 0 2 0 0 -1.5708</pose>
       <plugin name="traffic_light_control_3" filename="libtraffic_light_plugin.so">
         <ros>
           <namespace>/stop_light_3</namespace>
@@ -65,18 +121,5 @@
       </plugin>
     </include>
 
-    <!-- Stop light 4 -->
-    <include>
-      <uri>model://stop_light</uri>
-      <name>stop_light_4</name>
-      <pose>8 0 2 0 0 0</pose>
-      <plugin name="traffic_light_control_4" filename="libtraffic_light_plugin.so">
-        <ros>
-          <namespace>/stop_light_4</namespace>
-          <node_name>stop_light_4_node</node_name>
-        </ros>
-        <traffic_light_id>4</traffic_light_id>
-      </plugin>
-    </include>
   </world>
 </sdf>
