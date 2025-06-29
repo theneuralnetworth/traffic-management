@@ -1,0 +1,2 @@
+string traffic_light_id
+string new_state
