@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <sdf version="1.6">
   <world name="TrafficWorld">
     <!-- Sun and ground -->
@@ -65,11 +65,37 @@
       </link>
     </model>
 
-    <!-- Stop light 0 (North) -->
+    <!-- Pole & Stop light 0 -->
+    <model name="pole_0">
+      <static>true</static>
+      <pose> -1  2.5 1 0 0 0</pose>
+      <link name="pole_link">
+        <visual name="pole_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>2.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        <collision name="pole_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>2.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+    </model>
     <include>
       <uri>model://stop_light</uri>
       <name>stop_light_0</name>
-      <pose>0 3 2 0 0 3.1416</pose>
+      <pose> -1  2.5 2 0 0 3.1416</pose>
       <plugin name="traffic_light_control_0" filename="libtraffic_light_plugin.so">
         <ros>
           <namespace>/stop_light_0</namespace>
@@ -79,11 +105,37 @@
       </plugin>
     </include>
 
-    <!-- Stop light 1 (East) -->
+    <!-- Pole & Stop light 1 -->
+    <model name="pole_1">
+      <static>true</static>
+      <pose> 2.5  1 1 0 0 0</pose>
+      <link name="pole_link">
+        <visual name="pole_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>2.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        <collision name="pole_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>2.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+    </model>
     <include>
       <uri>model://stop_light</uri>
       <name>stop_light_1</name>
-      <pose>3 0 2 0 0 1.5708</pose>
+      <pose> 2.5  1 2 0 0 1.5708</pose>
       <plugin name="traffic_light_control_1" filename="libtraffic_light_plugin.so">
         <ros>
           <namespace>/stop_light_1</namespace>
@@ -93,11 +145,37 @@
       </plugin>
     </include>
 
-    <!-- Stop light 2 (South) -->
+    <!-- Pole & Stop light 2 -->
+    <model name="pole_2">
+      <static>true</static>
+      <pose>  1 -2.5 1 0 0 0</pose>
+      <link name="pole_link">
+        <visual name="pole_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>2.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        <collision name="pole_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>2.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+    </model>
     <include>
       <uri>model://stop_light</uri>
       <name>stop_light_2</name>
-      <pose>0 -3 2 0 0 0</pose>
+      <pose>  1 -2.5 2 0 0 0</pose>
       <plugin name="traffic_light_control_2" filename="libtraffic_light_plugin.so">
         <ros>
           <namespace>/stop_light_2</namespace>
@@ -107,11 +185,37 @@
       </plugin>
     </include>
 
-    <!-- Stop light 3 (West) -->
+    <!-- Pole & Stop light 3 -->
+    <model name="pole_3">
+      <static>true</static>
+      <pose> -2.5  1 1 0 0 0</pose>
+      <link name="pole_link">
+        <visual name="pole_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>2.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        <collision name="pole_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>2.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+    </model>
     <include>
       <uri>model://stop_light</uri>
       <name>stop_light_3</name>
-      <pose>-3 0 2 0 0 -1.5708</pose>
+      <pose> -2.5  1 2 0 0 -1.5708</pose>
       <plugin name="traffic_light_control_3" filename="libtraffic_light_plugin.so">
         <ros>
           <namespace>/stop_light_3</namespace>
